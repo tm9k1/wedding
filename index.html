@@ -79,6 +79,14 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
 .open-hit{position:absolute;left:22px;top:97px;width:316px;height:446px;z-index:9;margin:0;padding:0;border:0;border-radius:6px;background:transparent;cursor:pointer;
   -webkit-tap-highlight-color:transparent;touch-action:pan-y;-webkit-user-select:none;user-select:none;outline:none}
 .open-hit:focus-visible{outline:2px solid var(--zari-hi);outline-offset:6px}
+/* tap feedback: rings ripple from the seal and the envelope lifts, before the opening starts */
+.tap-ring{position:absolute;left:140px;top:290px;width:80px;height:80px;z-index:8;border-radius:50%;border:1.5px solid var(--zari-hi);
+  box-shadow:0 0 14px rgba(247,226,166,.45),inset 0 0 10px rgba(247,226,166,.25);opacity:0;pointer-events:none}
+.tapped .tap-ring{animation:ring .75s cubic-bezier(.2,.7,.3,1) forwards}
+.tapped .tap-ring.r2{animation-delay:.13s}
+.tapped .cam{animation:lift .34s ease-out}
+@keyframes ring{0%{opacity:.95;transform:scale(.55)}100%{opacity:0;transform:scale(2.7)}}
+@keyframes lift{0%{scale:1}40%{scale:1.035}100%{scale:1}}
 .skip{position:absolute;top:14px;right:16px;z-index:9;padding:8px 2px;font:400 11px/1 var(--f-caps);letter-spacing:.18em;text-transform:uppercase;color:var(--zari);text-decoration:none;border-bottom:1px solid rgba(214,173,92,.4)}
 .skip:hover{color:var(--zari-hi)}
 .skip:focus-visible{outline:2px solid var(--zari-hi);outline-offset:4px}
@@ -344,6 +352,7 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
     <div class="scene" id="scene">
       <p class="kicker" id="kicker"><span id="kickerLead">For you &amp; your family</span><span class="addressee" id="addressee" hidden></span></p>
       <button class="open-hit" id="openHit" type="button" aria-label="Open the invitation"></button>
+      <span class="tap-ring" aria-hidden="true"></span><span class="tap-ring r2" aria-hidden="true"></span>
 
       <div class="cam" id="cam">
         <div class="env-part env-back" id="envBack" aria-hidden="true">
@@ -1016,21 +1025,49 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
   // ---------- tap to open: glide through the whole opening, any scroll or key takes over ----------
   let auto = 0;
   function stopAuto() { if (auto) { cancelAnimationFrame(auto); auto = 0; } }
+  // pacing in seconds -> progress: brisk through the seal and flap, unhurried at the gates, settling at the end
+  const PACE = [[0, 0], [1.1, .25], [2.6, .57], [3.0, .62], [4.4, .84], [5.6, .955]];
+  const paceM = (() => {
+    const n = PACE.length, d = [], m = [0];
+    for (let i = 0; i < n - 1; i++) d.push((PACE[i + 1][1] - PACE[i][1]) / (PACE[i + 1][0] - PACE[i][0]));
+    for (let i = 1; i < n - 1; i++) m.push(d[i - 1] * d[i] <= 0 ? 0 : 2 / (1 / d[i - 1] + 1 / d[i]));   // monotone tangents
+    m.push(0);
+    return m;
+  })();
+  function paceAt(t) {
+    const L = PACE.length - 1;
+    if (t <= 0) return 0;
+    if (t >= PACE[L][0]) return PACE[L][1];
+    let i = 0;
+    while (t > PACE[i + 1][0]) i++;
+    const [x0, y0] = PACE[i], [x1, y1] = PACE[i + 1], h = x1 - x0, u = (t - x0) / h, u2 = u * u, u3 = u2 * u;
+    return (2 * u3 - 3 * u2 + 1) * y0 + (u3 - 2 * u2 + u) * h * paceM[i] + (3 * u2 - 2 * u3) * y1 + (u3 - u2) * h * paceM[i + 1];
+  }
   function openCard() {
     stopAuto();
-    const from = scrollY, end = trackTop + trackSpan * .955;
-    if (end <= from + 2) return;
-    const dur = Math.max(2200, 8000 * (end - from) / (trackSpan * .955)), t0 = performance.now();
+    const p0 = measure(), [tEnd, pEnd] = PACE[PACE.length - 1];
+    if (p0 >= pEnd - .002) return;
+    let lo = 0, hi = tEnd;   // pick up from wherever the guest already is
+    for (let i = 0; i < 30; i++) { const mid = (lo + hi) / 2; if (paceAt(mid) < p0) lo = mid; else hi = mid; }
+    const t0 = performance.now() - lo * 1000;
     const step = now => {
-      const t = clamp((now - t0) / dur), e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-      scrollTo(0, from + (end - from) * e);
-      auto = t < 1 ? requestAnimationFrame(step) : 0;
+      const t = (now - t0) / 1000;
+      scrollTo(0, trackTop + paceAt(t) * trackSpan);
+      auto = t < tEnd ? requestAnimationFrame(step) : 0;
     };
     auto = requestAnimationFrame(step);
   }
+  let tapT = 0;
   openHit.addEventListener('click', () => {
-    if (!RM) openCard();
+    // answer the tap at once, then start moving a beat later
+    scene.classList.remove('tapped');
+    void scene.offsetWidth;
+    scene.classList.add('tapped');
+    clearTimeout(tapT);
+    tapT = setTimeout(() => scene.classList.remove('tapped'), 950);
+    try { if (navigator.vibrate) navigator.vibrate(12); } catch (e) {}
     if (Music && !Music.on) setMusic(true);
+    if (!RM) setTimeout(openCard, 160);
   });
   for (const ev of ['wheel', 'touchstart', 'keydown']) addEventListener(ev, stopAuto, { passive: true });
 
