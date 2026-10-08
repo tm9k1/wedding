@@ -47,7 +47,7 @@
   color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:border-box}
-html{background:var(--night)}
+html{background:var(--night);-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-serif);-webkit-font-smoothing:antialiased;overflow-x:clip}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .defs{position:absolute;width:0;height:0;overflow:hidden}
@@ -76,8 +76,6 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
 .kicker.named{top:22px}
 .addressee{display:block;margin-top:2px;padding:0 20px;font:italic 400 19px/1.25 var(--f-serif);letter-spacing:0;text-transform:none;color:var(--zari-hi);text-wrap:balance;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.open-hit{position:absolute;left:22px;top:97px;width:316px;height:446px;z-index:9;margin:0;padding:0;border:0;border-radius:6px;background:transparent;cursor:pointer}
-.open-hit:focus-visible{outline:2px solid var(--zari-hi);outline-offset:6px}
 .skip{position:absolute;top:14px;right:16px;z-index:9;padding:8px 2px;font:400 11px/1 var(--f-caps);letter-spacing:.18em;text-transform:uppercase;color:var(--zari);text-decoration:none;border-bottom:1px solid rgba(214,173,92,.4)}
 .skip:hover{color:var(--zari-hi)}
 .skip:focus-visible{outline:2px solid var(--zari-hi);outline-offset:4px}
@@ -228,7 +226,7 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
 /* reduced motion: show the opened card, no scroll choreography */
 .rm .track{height:auto}
 .rm .stage{position:relative;top:0}
-.rm .cue,.rm .kicker,.rm .open-hit,.rm .prog{display:none}
+.rm .cue,.rm .kicker,.rm .prog{display:none}
 @media (prefers-reduced-motion:reduce){.thread,.music[aria-pressed="true"] .bars i{animation:none}}
 </style>
 </head>
@@ -342,7 +340,6 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
     <div class="prog" aria-hidden="true"><i id="progBar"></i></div>
     <div class="scene" id="scene">
       <p class="kicker" id="kicker"><span id="kickerLead">For you &amp; your family</span><span class="addressee" id="addressee" hidden></span></p>
-      <button class="open-hit" id="openHit" type="button" aria-label="Open the invitation"></button>
 
       <div class="cam" id="cam">
         <div class="env-part env-back" id="envBack" aria-hidden="true">
@@ -452,7 +449,7 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
         </div>
       </div>
 
-      <p class="cue cue-start" id="cueStart">Scroll or tap to open<span class="thread"></span></p>
+      <p class="cue cue-start" id="cueStart">Scroll to open<span class="thread"></span></p>
       <p class="cue cue-end" id="cueEnd">Scroll for the details<span class="thread"></span></p>
     </div>
   </div>
@@ -527,7 +524,7 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
   const envBack = $('envBack'), envPocket = $('envPocket'), envFlap = $('envFlap');
   const seal = $('seal'), sealL = $('sealL'), sealR = $('sealR');
   const doorL = $('doorL'), doorR = $('doorR'), hingeL = $('hingeL'), hingeR = $('hingeR'), cardShadow = $('cardShadow');
-  const kicker = $('kicker'), cueStart = $('cueStart'), cueEnd = $('cueEnd'), progBar = $('progBar'), openHit = $('openHit');
+  const kicker = $('kicker'), cueStart = $('cueStart'), cueEnd = $('cueEnd'), progBar = $('progBar');
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // The right door shows the same cover, shifted, so the art reads across the seam.
@@ -664,7 +661,6 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
 
     css(cueEnd, 'opacity', op(seg(p, .9, .96)));
     css(progBar, 'transform', `scaleX(${p.toFixed(4)})`);
-    if (openHit.hidden !== p > .9) openHit.hidden = p > .9;
 
     if (!RM) {
       if (th > 120 && burstArmed) { burstArmed = false; burst(); }
@@ -1011,27 +1007,6 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
   }
   if (!Music) musicBtn.hidden = true;
   musicBtn.addEventListener('click', () => setMusic(!Music.on));
-
-  // ---------- tap to open: glide through the whole opening, any scroll or key takes over ----------
-  let auto = 0;
-  function stopAuto() { if (auto) { cancelAnimationFrame(auto); auto = 0; } }
-  function openCard() {
-    stopAuto();
-    const from = scrollY, end = trackTop + trackSpan * .955;
-    if (end <= from + 2) return;
-    const dur = Math.max(2200, 8000 * (end - from) / (trackSpan * .955)), t0 = performance.now();
-    const step = now => {
-      const t = clamp((now - t0) / dur), e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-      scrollTo(0, from + (end - from) * e);
-      auto = t < 1 ? requestAnimationFrame(step) : 0;
-    };
-    auto = requestAnimationFrame(step);
-  }
-  openHit.addEventListener('click', () => {
-    if (!RM) openCard();
-    if (Music && !Music.on) setMusic(true);
-  });
-  for (const ev of ['wheel', 'touchstart', 'keydown']) addEventListener(ev, stopAuto, { passive: true });
 
   $('again').addEventListener('click', () => window.scrollTo({ top: 0, behavior: RM ? 'auto' : 'smooth' }));
 

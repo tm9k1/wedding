@@ -1,6 +1,6 @@
 # Nitya & Piyush · wedding invitation
 
-Live at **https://tm9k1.github.io/wedding/**: a scroll-to-open (or tap-to-open) 3D wedding card for 25 November 2026.
+Live at **https://tm9k1.github.io/wedding/**: a scroll-to-open 3D wedding card for 25 November 2026.
 
 ## Personal links
 The details come in English, हिंदी and తెలుగు (the Telugu is awaiting a proofread by Nitya).
