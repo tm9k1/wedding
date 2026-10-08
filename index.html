@@ -1081,7 +1081,36 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
   });
   for (const ev of ['wheel', 'touchstart', 'keydown']) addEventListener(ev, stopAuto, { passive: true });
 
-  $('again').addEventListener('click', () => window.scrollTo({ top: 0, behavior: RM ? 'auto' : 'smooth' }));
+  // "Open the card again": hurry back up to the opened card, then fold it shut at the opening's own pace
+  function paceInverse(p) {
+    let lo = 0, hi = PACE[PACE.length - 1][0];
+    for (let i = 0; i < 30; i++) { const mid = (lo + hi) / 2; if (paceAt(mid) < p) lo = mid; else hi = mid; }
+    return lo;
+  }
+  function closeCard() {
+    stopAuto();
+    if (RM) { scrollTo(0, 0); return; }
+    const [tEnd, pEnd] = PACE[PACE.length - 1];
+    const yOpen = trackTop + pEnd * trackSpan, from = scrollY;
+    const rush = from > yOpen + 2;                                   // coming down from the details
+    const rushMs = rush ? Math.min(900, Math.max(380, (from - yOpen) / 3.2)) : 0;
+    const tStart = rush ? tEnd : paceInverse(measure());
+    const t0 = performance.now();
+    const step = now => {
+      const ms = now - t0;
+      if (ms < rushMs) {
+        const a = ms / rushMs, k = a < .5 ? 4 * a * a * a : 1 - Math.pow(-2 * a + 2, 3) / 2;
+        scrollTo(0, from + (yOpen - from) * k);
+      } else {
+        const t = Math.max(0, tStart - (ms - rushMs) / 1000);
+        scrollTo(0, trackTop + paceAt(t) * trackSpan);
+        if (t <= 0) { auto = 0; return; }
+      }
+      auto = requestAnimationFrame(step);
+    };
+    auto = requestAnimationFrame(step);
+  }
+  $('again').addEventListener('click', closeCard);
 
   // ---------- fit + boot ----------
   function fit() {
