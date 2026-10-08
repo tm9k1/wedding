@@ -82,6 +82,7 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
 /* tap feedback: rings ripple from the seal and the envelope lifts, before the opening starts */
 .tap-ring{position:absolute;left:140px;top:290px;width:80px;height:80px;z-index:8;border-radius:50%;border:1.5px solid var(--zari-hi);
   box-shadow:0 0 14px rgba(247,226,166,.45),inset 0 0 10px rgba(247,226,166,.25);opacity:0;pointer-events:none}
+.at-card .tap-ring{top:266px}
 .tapped .tap-ring{animation:ring .75s cubic-bezier(.2,.7,.3,1) forwards}
 .tapped .tap-ring.r2{animation-delay:.13s}
 .tapped .cam{animation:lift .34s ease-out}
@@ -106,6 +107,7 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
 .cue{position:absolute;left:0;right:0;z-index:8;text-align:center;font:400 10px/1 var(--f-caps);letter-spacing:.32em;padding-left:.32em;text-transform:uppercase;color:var(--zari);pointer-events:none}
 .cue-start{top:566px}
 .cue-end{top:568px;opacity:0}
+.cue-card{top:566px;opacity:0}
 .thread{display:block;width:1px;height:30px;margin:12px auto 0;background:linear-gradient(var(--zari),rgba(214,173,92,0));transform-origin:top;animation:thread 2.4s ease-in-out infinite}
 @keyframes thread{0%{transform:scaleY(0);opacity:1}60%{transform:scaleY(1);opacity:1}100%{transform:scaleY(1);opacity:0}}
 
@@ -463,6 +465,7 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
       </div>
 
       <p class="cue cue-start" id="cueStart">Scroll or tap to open<span class="thread"></span></p>
+      <p class="cue cue-card" id="cueCard">Tap or scroll to open the card<span class="thread"></span></p>
       <p class="cue cue-end" id="cueEnd">Scroll for the details<span class="thread"></span></p>
     </div>
   </div>
@@ -537,7 +540,7 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
   const envBack = $('envBack'), envPocket = $('envPocket'), envFlap = $('envFlap');
   const seal = $('seal'), sealL = $('sealL'), sealR = $('sealR');
   const doorL = $('doorL'), doorR = $('doorR'), hingeL = $('hingeL'), hingeR = $('hingeR'), cardShadow = $('cardShadow');
-  const kicker = $('kicker'), cueStart = $('cueStart'), cueEnd = $('cueEnd'), progBar = $('progBar'), openHit = $('openHit');
+  const kicker = $('kicker'), cueStart = $('cueStart'), cueEnd = $('cueEnd'), cueCard = $('cueCard'), progBar = $('progBar'), openHit = $('openHit');
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // The right door shows the same cover, shifted, so the art reads across the seam.
@@ -673,6 +676,9 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
     css(hingeL, 'opacity', hinge); css(hingeR, 'opacity', hinge);
 
     css(cueEnd, 'opacity', op(seg(p, .9, .96)));
+    css(cueCard, 'opacity', op(seg(p, .56, .585) * (1 - seg(p, .615, .635))));
+    const atCard = p > .45;
+    if (scene.classList.contains('at-card') !== atCard) scene.classList.toggle('at-card', atCard);
     css(progBar, 'transform', `scaleX(${p.toFixed(4)})`);
     if (openHit.hidden !== p > .9) openHit.hidden = p > .9;
 
@@ -1026,12 +1032,14 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
   let auto = 0;
   function stopAuto() { if (auto) { cancelAnimationFrame(auto); auto = 0; } }
   // pacing in seconds -> progress: a brisk first beat to the seal breaking, then an unhurried opening that settles at the end
-  const PACE = [[0, 0], [.65, .12], [1.7, .25], [3.4, .57], [3.95, .62], [5.9, .84], [7.6, .955]];
+  // the closed card (index STOP_I) is a resting point: the first tap stops there, the next opens the gates
+  const PACE = [[0, 0], [.65, .12], [1.7, .25], [3.0, .53], [3.7, .60], [5.6, .84], [7.1, .955]], STOP_I = 4;
   const paceM = (() => {
     const n = PACE.length, d = [], m = [0];
     for (let i = 0; i < n - 1; i++) d.push((PACE[i + 1][1] - PACE[i][1]) / (PACE[i + 1][0] - PACE[i][0]));
     for (let i = 1; i < n - 1; i++) m.push(d[i - 1] * d[i] <= 0 ? 0 : 2 / (1 / d[i - 1] + 1 / d[i]));   // monotone tangents
     m.push(0);
+    m[STOP_I] = 0;   // come to rest at the closed card
     return m;
   })();
   function paceAt(t) {
@@ -1045,15 +1053,17 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
   }
   function openCard() {
     stopAuto();
-    const p0 = measure(), [tEnd, pEnd] = PACE[PACE.length - 1];
+    const p0 = measure(), [tStop, pStop] = PACE[STOP_I], [tEnd, pEnd] = PACE[PACE.length - 1];
     if (p0 >= pEnd - .002) return;
-    let lo = 0, hi = tEnd;   // pick up from wherever the guest already is
+    // before the closed card: bring it out and stop; at or past it: open the gates
+    const tGoal = p0 < pStop - .01 ? tStop : tEnd;
+    let lo = 0, hi = tGoal;   // pick up from wherever the guest already is
     for (let i = 0; i < 30; i++) { const mid = (lo + hi) / 2; if (paceAt(mid) < p0) lo = mid; else hi = mid; }
     const t0 = performance.now() - lo * 1000;
     const step = now => {
-      const t = (now - t0) / 1000;
+      const t = Math.min(tGoal, (now - t0) / 1000);
       scrollTo(0, trackTop + paceAt(t) * trackSpan);
-      auto = t < tEnd ? requestAnimationFrame(step) : 0;
+      auto = t < tGoal ? requestAnimationFrame(step) : 0;
     };
     auto = requestAnimationFrame(step);
   }
