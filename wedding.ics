@@ -1,0 +1,21 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Nitya & Piyush//Wedding//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:nitya-piyush-wedding-20261125@tm9k1.github.io
+DTSTAMP:20261008T000000Z
+DTSTART:20261125T133000Z
+DTEND:20261125T183000Z
+SUMMARY:Nitya & Piyush's Wedding
+LOCATION:The Royal by Meraki\, Sector 15\, Rohini\, Delhi
+DESCRIPTION:Wedding celebration of Nitya Prakash and Piyush Aggarwal\, 7:00 PM onwards.\nhttps://tm9k1.github.io/wedding/
+URL:https://tm9k1.github.io/wedding/
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Nitya & Piyush's wedding is tomorrow
+END:VALARM
+END:VEVENT
+END:VCALENDAR
