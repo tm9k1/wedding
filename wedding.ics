@@ -10,8 +10,8 @@ DTSTART:20261125T133000Z
 DTEND:20261125T183000Z
 SUMMARY:Nitya & Piyush's Wedding
 LOCATION:The Royal by Meraki\, Sector 15\, Rohini\, Delhi
-DESCRIPTION:Wedding celebration of Nitya Prakash and Piyush Aggarwal\, 7:00 PM onwards.\nMap: https://maps.app.goo.gl/aWKCJA8SwJBW33zB7\nhttps://tm9k1.github.io/wedding/
-URL:https://tm9k1.github.io/wedding/
+DESCRIPTION:Wedding celebration of Nitya Prakash and Piyush Aggarwal\, 7:00 PM onwards.\nMap: https://maps.app.goo.gl/aWKCJA8SwJBW33zB7\nhttps://wedding.piyushaggarwal.in/
+URL:https://wedding.piyushaggarwal.in/
 BEGIN:VALARM
 TRIGGER:-P1D
 ACTION:DISPLAY

@@ -1,13 +1,13 @@
 # Nitya & Piyush · wedding invitation
 
-Live at **https://tm9k1.github.io/wedding/**: a scroll-to-open (or tap-to-open) 3D wedding card for 25 November 2026.
+Live at **https://wedding.piyushaggarwal.in/** (also mirrored at https://tm9k1.github.io/wedding/): a scroll-to-open (or tap-to-open) 3D wedding card for 25 November 2026.
 
 ## Personal links
 The details come in English, हिंदी and తెలుగు (the Telugu is awaiting a proofread by Nitya).
 
 Add `?to=` with the guest's name and it appears on the envelope and in the greeting:
 
-    https://tm9k1.github.io/wedding/?to=Sharma%20Family
+    https://wedding.piyushaggarwal.in/?to=Sharma%20Family
 
 (Spaces become `%20`; WhatsApp also accepts the link with plain spaces replaced by `%20`.)
 
@@ -22,3 +22,8 @@ Near the top of the `<script>` in `index.html`:
 - `wedding.ics`: the Apple/Outlook calendar entry
 
 GitHub Pages serves the `gh-pages` branch; push `main` to both `main` and `gh-pages`.
+
+## Hosting
+- **wedding.piyushaggarwal.in** is served by SWAG on REQUIEM: `site-confs/wedding.subdomain.conf`, files in `/config/www/wedding` (a clone of this repo). After pushing, update it with
+  `git -C /etc/container_configs/reverse_proxy/swag/config/www/wedding pull` on REQUIEM.
+- GitHub Pages keeps a mirror at https://tm9k1.github.io/wedding/.
