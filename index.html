@@ -29,7 +29,7 @@
 :root{
   --night:#170a14;          /* wedding night, aubergine-black */
   --night-hi:#2a1224;
-  --silk:#a85a2e;           /* copper silk */
+  --silk:#7e4220;           /* deep copper silk */
   --peacock:#0e4d4f;        /* contrast border silk */
   --zari-lo:#9c7128;        /* gold zari thread */
   --zari:#d6ad5c;
@@ -59,7 +59,7 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
 /* ---------- stage ---------- */
 .track{position:relative;z-index:1;height:640vh;height:640svh}
 .stage{position:sticky;top:env(safe-area-inset-top,0px);height:100vh;height:calc(100svh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow:hidden;display:grid;place-items:center;
-  background:radial-gradient(55% 45% at 50% 56%,rgba(184,98,52,.20),rgba(184,98,52,0) 70%)}
+  background:radial-gradient(55% 45% at 50% 56%,rgba(150,76,36,.18),rgba(150,76,36,0) 70%)}
 .scene{position:relative;width:360px;height:640px;--sheen:30%}
 /* while the card is moving, keep its layers' rasters (no re-raster per frame); dropped at rest so text re-renders crisp */
 .moving .env-part,.moving .card,.moving .card-shadow,.moving .inner,.moving .door{will-change:transform}
@@ -245,10 +245,10 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
       <stop offset="0" stop-color="#7a5216"/><stop offset=".35" stop-color="#c49a48"/><stop offset=".5" stop-color="#e2c27a"/><stop offset=".7" stop-color="#a77a2c"/><stop offset="1" stop-color="#6f4a14"/>
     </linearGradient>
     <linearGradient id="gSilk" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="316" y2="446">
-      <stop offset="0" stop-color="#5c2810"/><stop offset=".32" stop-color="#99502a"/><stop offset=".5" stop-color="#c98050"/><stop offset=".64" stop-color="#a65d31"/><stop offset="1" stop-color="#55240e"/>
+      <stop offset="0" stop-color="#3d1908"/><stop offset=".32" stop-color="#70361a"/><stop offset=".5" stop-color="#9a5832"/><stop offset=".64" stop-color="#7b4120"/><stop offset="1" stop-color="#371606"/>
     </linearGradient>
     <linearGradient id="gSilkFlap" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="316" y2="252">
-      <stop offset="0" stop-color="#6c3216"/><stop offset=".42" stop-color="#b0663b"/><stop offset=".55" stop-color="#d6955f"/><stop offset=".72" stop-color="#a95d31"/><stop offset="1" stop-color="#652d13"/>
+      <stop offset="0" stop-color="#4a200c"/><stop offset=".42" stop-color="#844826"/><stop offset=".55" stop-color="#a96a40"/><stop offset=".72" stop-color="#7e3f1e"/><stop offset="1" stop-color="#441d0a"/>
     </linearGradient>
     <linearGradient id="gPeacock" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="316" y2="458">
       <stop offset="0" stop-color="#093a3c"/><stop offset=".45" stop-color="#0f5858"/><stop offset=".56" stop-color="#136867"/><stop offset="1" stop-color="#0a4143"/>
@@ -418,7 +418,7 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
           <svg viewBox="0 0 316 446" width="316" height="446" aria-hidden="true">
             <path d="M0 4Q0 0 4 1L158 236L312 1Q316 0 316 4V440Q316 446 310 446H6Q0 446 0 440Z" fill="url(#gSilk)"/>
             <path d="M0 446L158 270L316 446" fill="none" stroke="#3a1606" stroke-opacity=".32" stroke-width="1.2"/>
-            <path d="M2 447L158 273L314 447" fill="none" stroke="#ffd2a8" stroke-opacity=".12" stroke-width=".8"/>
+            <path d="M2 447L158 273L314 447" fill="none" stroke="#ffd2a8" stroke-opacity=".09" stroke-width=".8"/>
             <path d="M4 16L158 246L312 16" fill="none" stroke="url(#gGold)" stroke-width="1.3"/>
             <rect x="18" y="405" width="280" height="9" fill="url(#pTempleUp)"/>
             <path d="M18 402.5H298M18 416.5H298" stroke="#d6ad5c" stroke-width=".7"/>
