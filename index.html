@@ -1025,8 +1025,8 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
   // ---------- tap to open: glide through the whole opening, any scroll or key takes over ----------
   let auto = 0;
   function stopAuto() { if (auto) { cancelAnimationFrame(auto); auto = 0; } }
-  // pacing in seconds -> progress: brisk through the seal and flap, unhurried at the gates, settling at the end
-  const PACE = [[0, 0], [1.1, .25], [2.6, .57], [3.0, .62], [4.4, .84], [5.6, .955]];
+  // pacing in seconds -> progress: a brisk first beat to the seal breaking, then an unhurried opening that settles at the end
+  const PACE = [[0, 0], [.65, .12], [1.7, .25], [3.4, .57], [3.95, .62], [5.9, .84], [7.6, .955]];
   const paceM = (() => {
     const n = PACE.length, d = [], m = [0];
     for (let i = 0; i < n - 1; i++) d.push((PACE[i + 1][1] - PACE[i][1]) / (PACE[i + 1][0] - PACE[i][0]));
