@@ -3,6 +3,8 @@
 Live at **https://tm9k1.github.io/wedding/**: a scroll-to-open (or tap-to-open) 3D wedding card for 25 November 2026.
 
 ## Personal links
+The details come in English, हिंदी and తెలుగు (the Telugu is awaiting a proofread by Nitya).
+
 Add `?to=` with the guest's name and it appears on the envelope and in the greeting:
 
     https://tm9k1.github.io/wedding/?to=Sharma%20Family
@@ -12,7 +14,7 @@ Add `?to=` with the guest's name and it appears on the envelope and in the greet
 ## Settings
 Near the top of the `<script>` in `index.html`:
 - `RSVP_TO`: a WhatsApp number with country code (e.g. `9198XXXXXXXX`) sends RSVP replies straight to that chat. Empty lets the guest pick the chat.
-- `MAP_URL`: the venue's Google Maps share link, for an exact pin. Empty searches by name.
+- `MAP_URL`: the venue's Google Maps pin (set to https://maps.app.goo.gl/aWKCJA8SwJBW33zB7).
 
 ## Files
 - `index.html`: the page (fonts load from Google Fonts; everything else is inline)

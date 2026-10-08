@@ -60,7 +60,9 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
 .track{position:relative;z-index:1;height:640vh;height:640svh}
 .stage{position:sticky;top:env(safe-area-inset-top,0px);height:100vh;height:calc(100svh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow:hidden;display:grid;place-items:center;
   background:radial-gradient(55% 45% at 50% 56%,rgba(160,21,90,.20),rgba(160,21,90,0) 70%)}
-.scene{position:relative;width:360px;height:640px;--sheen:12%}
+.scene{position:relative;width:360px;height:640px;--sheen:30%}
+/* while the card is moving, keep its layers' rasters (no re-raster per frame); dropped at rest so text re-renders crisp */
+.moving .env-part,.moving .card,.moving .card-shadow,.moving .inner,.moving .door{will-change:transform}
 .scene p{margin:0}
 .scene svg{display:block;overflow:visible}
 /* one shared camera: every part is projected through this perspective, then painted in z-index order */
@@ -82,7 +84,7 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
 .prog{position:absolute;left:0;right:0;bottom:0;z-index:9;height:2px;background:rgba(214,173,92,.14)}
 .prog i{display:block;height:100%;background:linear-gradient(90deg,var(--zari-lo),var(--zari-hi));transform-origin:0 50%;transform:scaleX(0)}
 .music{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:10;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:10px 16px 10px 13px;
-  border:1px solid rgba(214,173,92,.55);border-radius:999px;background:rgba(23,10,20,.78);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:var(--zari-hi);font:400 11.5px/1 var(--f-caps);letter-spacing:.18em;text-transform:uppercase;cursor:pointer}
+  border:1px solid rgba(214,173,92,.55);border-radius:999px;background:rgba(23,10,20,.92);color:var(--zari-hi);font:400 11.5px/1 var(--f-caps);letter-spacing:.18em;text-transform:uppercase;cursor:pointer}
 .music:hover{border-color:var(--zari-hi)}
 .music:focus-visible{outline:2px solid var(--zari-hi);outline-offset:3px}
 .bars{display:inline-flex;align-items:flex-end;gap:2px;width:14px;height:12px}
@@ -116,7 +118,7 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
 /* ---------- card ---------- */
 .card{position:absolute;left:22px;top:91px;width:316px;height:458px;z-index:3;transform:rotateX(14deg) rotateZ(-2deg) scale(.92);transform-origin:50% 50%;transform-style:preserve-3d}
 .card-shadow{position:absolute;left:22px;top:91px;width:316px;height:458px;z-index:2;opacity:0;pointer-events:none;transform-origin:50% 50%;
-  background:radial-gradient(closest-side,rgba(4,0,3,.7),rgba(4,0,3,0));filter:blur(14px)}
+  background:radial-gradient(closest-side,rgba(4,0,3,.6),rgba(4,0,3,.32) 45%,rgba(4,0,3,.08) 80%,rgba(4,0,3,0))}
 /* paper thickness: two sheets stepped back behind the face */
 .card-back,.card-mid{position:absolute;inset:0;border-radius:2px}
 .card-mid{background:#e6dbc2;transform:translateZ(-1.2px)}
@@ -135,7 +137,7 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
 .ic-couple{display:flex;flex-direction:column;align-items:center}
 .ic-person{display:grid;justify-items:center}
 .ic-name{font:400 34px/1.2 var(--f-script);padding:0 .3em}
-.ic-parents{font:italic 400 11.5px/1.35 var(--f-serif);opacity:.85}
+.ic-parents{font:italic 400 11.5px/1.35 var(--f-serif);opacity:.85;text-wrap:balance}
 .ic-amp{font:italic 400 18px/1.2 var(--f-serif);color:var(--bronze);padding-block:4px 1px}
 .ic-request{font:400 12.5px/1.45 var(--f-serif);text-wrap:balance}
 .ic-date{display:grid;justify-items:center;gap:5px}
@@ -207,10 +209,15 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
 .lang button[aria-pressed="true"]{background:var(--zari);color:var(--night)}
 .lang button:focus-visible{outline:2px solid var(--zari-hi);outline-offset:2px}
 .lang button[data-lang="hi"]{font-family:var(--f-deva);font-size:15px}
-/* Hindi: Devanagari face, and no letter-spacing or caps (they break conjuncts) */
+.lang button[data-lang="te"]{font-family:var(--f-telu);font-size:14px}
+/* Hindi and Telugu: their own faces, and no letter-spacing or caps (they break conjuncts) */
 .details:lang(hi) .quote,.details:lang(hi) .closing,.details:lang(hi) .fact-v,.details:lang(hi) .fact-s,.details:lang(hi) .count-note,.details:lang(hi) .greet{font-family:var(--f-deva);font-style:normal}
 .details:lang(hi) .eyebrow,.details:lang(hi) .fact-l,.details:lang(hi) .unit-l,.details:lang(hi) .btn,
 .skip:lang(hi),.music span:lang(hi){font-family:var(--f-deva);letter-spacing:0;padding-left:0;text-transform:none;font-size:15px}
+.details:lang(te) .quote,.details:lang(te) .closing,.details:lang(te) .fact-v,.details:lang(te) .fact-s,.details:lang(te) .count-note,.details:lang(te) .greet{font-family:var(--f-telu);font-style:normal;line-height:1.7}
+.details:lang(te) .eyebrow,.details:lang(te) .fact-l,.details:lang(te) .unit-l,.details:lang(te) .btn,
+.skip:lang(te),.music span:lang(te){font-family:var(--f-telu);letter-spacing:0;padding-left:0;text-transform:none;font-size:14px;line-height:1.5}
+.details:lang(hi) .btn,.details:lang(te) .btn{padding-left:22px}
 @media (max-width:620px){
   .facts{grid-template-columns:1fr}
   .fact + .fact{border-left:0;border-top:1px solid rgba(214,173,92,.35)}
@@ -358,7 +365,7 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
                 <div class="ic-couple">
                   <div class="ic-person">
                     <p class="ic-name foil-deep">Nitya Prakash</p>
-                    <p class="ic-parents">daughter of Mr. K.S. Prakash &amp; Ms. Geeta</p>
+                    <p class="ic-parents">daughter of Late Mr. K.S. Prakash &amp; Ms. Geeta</p>
                   </div>
                   <p class="ic-amp">&amp;</p>
                   <div class="ic-person">
@@ -455,6 +462,7 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
     <div class="lang" role="group" aria-label="Language">
       <button type="button" data-lang="en" aria-pressed="true">English</button>
       <button type="button" data-lang="hi" aria-pressed="false" lang="hi">हिंदी</button>
+      <button type="button" data-lang="te" aria-pressed="false" lang="te">తెలుగు</button>
     </div>
     <p class="greet" id="greet" hidden></p>
     <p class="eyebrow" id="blessing-h" data-i18n="blessingH">With blessings &amp; love</p>
@@ -482,7 +490,7 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
       <div class="fact"><span class="fact-l" data-i18n="venueL">The venue</span><span class="fact-v" data-i18n="venueV">The Royal by Meraki</span><span class="fact-s" data-i18n="venueS">Sector 15, Rohini, Delhi</span></div>
     </div>
     <div class="actions">
-      <a class="btn solid" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Nitya%20%26%20Piyush%E2%80%99s%20Wedding&amp;dates=20261125T133000Z/20261125T183000Z&amp;location=The%20Royal%20by%20Meraki%2C%20Sector%2015%2C%20Rohini%2C%20Delhi&amp;details=Wedding%20celebration%20of%20Nitya%20Prakash%20and%20Piyush%20Aggarwal%2C%207%3A00%20PM%20onwards." target="_blank" rel="noopener" data-i18n="gcal">Google Calendar</a>
+      <a class="btn solid" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Nitya%20%26%20Piyush%E2%80%99s%20Wedding&amp;dates=20261125T133000Z/20261125T183000Z&amp;location=The%20Royal%20by%20Meraki%2C%20Sector%2015%2C%20Rohini%2C%20Delhi&amp;details=Wedding%20celebration%20of%20Nitya%20Prakash%20and%20Piyush%20Aggarwal%2C%207%3A00%20PM%20onwards.%0AMap%3A%20https%3A%2F%2Fmaps.app.goo.gl%2FaWKCJA8SwJBW33zB7" target="_blank" rel="noopener" data-i18n="gcal">Google Calendar</a>
       <a class="btn" id="ics" href="wedding.ics" data-i18n="ical">Apple Calendar</a>
       <a class="btn" id="maps" href="https://www.google.com/maps/search/?api=1&amp;query=The%20Royal%20by%20Meraki%2C%20Sector%2015%2C%20Rohini%2C%20Delhi" target="_blank" rel="noopener" data-i18n="maps">Get directions</a>
     </div>
@@ -576,18 +584,27 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
   let AW = 392;               // usable stage width in scene units, set by fit()
   let ptx = 0, pty = 0;       // eased pointer position, -1..1, for a desktop hover tilt
   let burstArmed = true;
+  // write a style only when its value changes: repeated writes still cost style work on large 3D layers
+  const memo = new WeakMap();
+  function css(el, prop, v) {
+    let m = memo.get(el);
+    if (!m) memo.set(el, m = {});
+    if (m[prop] !== v) { m[prop] = v; el.style[prop] = v; }
+  }
+  const op = v => v.toFixed(3);
+  const vis = v => v <= 0 ? 'hidden' : 'visible';
+
   function render(p) {
-    scene.style.setProperty('--sheen', (12 + 76 * p).toFixed(1) + '%');
-    cueStart.style.opacity = (1 - seg(p, 0, .035)).toFixed(3);
-    kicker.style.opacity = (1 - seg(p, .02, .1)).toFixed(3);
+    css(cueStart, 'opacity', op(1 - seg(p, 0, .035)));
+    css(kicker, 'opacity', op(1 - seg(p, .02, .1)));
 
     // seal cracks in two and drops
     const s = io(seg(p, .03, .12));
-    sealL.style.transform = `translate(${f2(-18 * s)}px,${f2(46 * s * s)}px) rotate(${f2(-26 * s)}deg)`;
-    sealR.style.transform = `translate(${f2(18 * s)}px,${f2(46 * s * s)}px) rotate(${f2(26 * s)}deg)`;
+    css(sealL, 'transform', `translate(${f2(-18 * s)}px,${f2(46 * s * s)}px) rotate(${f2(-26 * s)}deg)`);
+    css(sealR, 'transform', `translate(${f2(18 * s)}px,${f2(46 * s * s)}px) rotate(${f2(26 * s)}deg)`);
     const sealOp = 1 - seg(p, .075, .12);
-    seal.style.opacity = sealOp.toFixed(3);
-    seal.style.visibility = sealOp <= 0 ? 'hidden' : 'visible';
+    css(seal, 'opacity', op(sealOp));
+    css(seal, 'visibility', vis(sealOp));
 
     const ang = 180 * io(seg(p, .11, .25));
     const rise = io(seg(p, .25, .45)), settle = io(seg(p, .45, .57));
@@ -598,21 +615,25 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
     const openW = 316 + 2 * Math.max(0, -158 * cth);
     const fitZ = Math.min(1, (AW - 28) / (openW * 1.04));
     const camZ = (1 - .4 * rise + .4 * settle) * lerp(fitZ, 1, dolly);
-    cam.style.transform = `scale(${camZ.toFixed(4)})`;
+    css(cam, 'transform', `scale(${camZ.toFixed(4)})`);
 
     // envelope: one tilted plane; it tips back and falls away once the card is out
-    const ex = ENV_TILT[0] + 40 * settle, ey = ENV_TILT[1], ez = ENV_TILT[2] - 5 * settle;
-    const envW = `translate3d(0,${f2(150 * rise + 560 * settle)}px,${f2(-260 * settle)}px)`;
-    const envR = `rotateX(${f2(ex)}deg) rotateY(${f2(ey)}deg) rotateZ(${f2(ez)}deg)`;
-    envBack.style.transform = envPocket.style.transform = `${envW} ${envR}`;
-    // flap and seal pivot about the envelope's centre (the flap hinge sits 223px above it)
-    envFlap.style.transform = `${envW} translateY(223px) ${envR} translateY(-223px) rotateX(${f2(ang)}deg)`;
-    envFlap.style.zIndex = ang > 90 ? 2 : 5;
-    seal.style.transform = `${envW} translateY(-10px) ${envR} translateY(10px)`;
-    const envOp = 1 - seg(p, .5, .57);
-    envBack.style.opacity = envPocket.style.opacity = envOp.toFixed(3);
-    flapFaces.forEach(f => { f.style.opacity = envOp.toFixed(3); });
-    for (const el of [envBack, envPocket, envFlap]) el.style.visibility = envOp <= 0 ? 'hidden' : 'visible';
+    const envOp = 1 - seg(p, .5, .57), envVis = vis(envOp);
+    for (const el of [envBack, envPocket, envFlap]) css(el, 'visibility', envVis);
+    if (envOp > 0) {
+      const ex = ENV_TILT[0] + 40 * settle, ey = ENV_TILT[1], ez = ENV_TILT[2] - 5 * settle;
+      const envW = `translate3d(0,${f2(150 * rise + 560 * settle)}px,${f2(-260 * settle)}px)`;
+      const envR = `rotateX(${f2(ex)}deg) rotateY(${f2(ey)}deg) rotateZ(${f2(ez)}deg)`;
+      css(envBack, 'transform', `${envW} ${envR}`);
+      css(envPocket, 'transform', `${envW} ${envR}`);
+      // flap and seal pivot about the envelope's centre (the flap hinge sits 223px above it)
+      css(envFlap, 'transform', `${envW} translateY(223px) ${envR} translateY(-223px) rotateX(${f2(ang)}deg)`);
+      css(envFlap, 'zIndex', ang > 90 ? '2' : '5');
+      if (sealOp > 0) css(seal, 'transform', `${envW} translateY(-10px) ${envR} translateY(10px)`);
+      css(envBack, 'opacity', op(envOp));
+      css(envPocket, 'opacity', op(envOp));
+      flapFaces.forEach(f => css(f, 'opacity', op(envOp)));
+    }
 
     // card: slides up inside the envelope's plane, then lifts free and turns toward the reader
     const rest = seg(p, .57, .62);
@@ -620,24 +641,29 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
     ax -= pty * 5 * rest; ay += ptx * 8 * rest;
     const cs = .92 + .08 * settle;
     const cardW = `translate3d(0,${f2(150 * rise * (1 - settle))}px,0) rotateX(${f2(ax)}deg) rotateY(${f2(ay)}deg) rotateZ(${f2(az)}deg)`;
-    card.style.transform = `${cardW} translateY(${f2(-440 * rise * (1 - settle))}px) scale(${cs.toFixed(4)})`;
-    card.style.zIndex = rise >= .999 ? 7 : 3;
+    css(card, 'transform', `${cardW} translateY(${f2(-440 * rise * (1 - settle))}px) scale(${cs.toFixed(4)})`);
+    css(card, 'zIndex', rise >= .999 ? '7' : '3');
     // its shadow on the night below, widening as the doors spread
-    cardShadow.style.zIndex = rise >= .999 ? 6 : 2;
-    cardShadow.style.opacity = (settle * (1 - .35 * dolly)).toFixed(3);
-    cardShadow.style.transform = `${cardW} translate3d(10px,26px,-70px) scale(${(cs * openW / 316 * 1.02).toFixed(3)},${(cs * 1.02).toFixed(3)})`;
+    const shOp = settle * (1 - .35 * dolly);
+    css(cardShadow, 'opacity', op(shOp));
+    css(cardShadow, 'visibility', vis(shOp));
+    if (shOp > 0) {
+      css(cardShadow, 'zIndex', rise >= .999 ? '6' : '2');
+      css(cardShadow, 'transform', `${cardW} translate3d(10px,26px,-70px) scale(${(cs * openW / 316 * 1.02).toFixed(3)},${(cs * 1.02).toFixed(3)})`);
+    }
 
     // doors: full swing on outer hinges, faces shaded by their angle to the light
-    doorL.style.transform = `translateZ(.8px) rotateY(${f2(-th)}deg)`;
-    doorR.style.transform = `translateZ(.8px) rotateY(${f2(th)}deg)`;
+    css(doorL, 'transform', `translateZ(.8px) rotateY(${f2(-th)}deg)`);
+    css(doorR, 'transform', `translateZ(.8px) rotateY(${f2(th)}deg)`);
     const front = th < 90 ? .66 * (1 - cth) : .66, back = th > 90 ? .58 * (1 + cth) : .58;
-    shadeF[0].style.opacity = (front * .9).toFixed(3); shadeF[1].style.opacity = front.toFixed(3);
-    shadeB[0].style.opacity = back.toFixed(3); shadeB[1].style.opacity = (back * .9).toFixed(3);
-    hingeL.style.opacity = hingeR.style.opacity = (sth * (th < 90 ? 1 : .8)).toFixed(3);
+    css(shadeF[0], 'opacity', op(front * .9)); css(shadeF[1], 'opacity', op(front));
+    css(shadeB[0], 'opacity', op(back)); css(shadeB[1], 'opacity', op(back * .9));
+    const hinge = op(sth * (th < 90 ? 1 : .8));
+    css(hingeL, 'opacity', hinge); css(hingeR, 'opacity', hinge);
 
-    cueEnd.style.opacity = seg(p, .9, .96).toFixed(3);
-    progBar.style.transform = `scaleX(${p.toFixed(4)})`;
-    openHit.hidden = p > .9;
+    css(cueEnd, 'opacity', op(seg(p, .9, .96)));
+    css(progBar, 'transform', `scaleX(${p.toFixed(4)})`);
+    if (openHit.hidden !== p > .9) openHit.hidden = p > .9;
 
     if (!RM) {
       if (th > 120 && burstArmed) { burstArmed = false; burst(); }
@@ -646,23 +672,30 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
   }
 
   // Scroll -> progress, eased toward the target (time-based) so wheel steps glide; big jumps snap.
-  let target = 0, cur = 0, raf = 0, lastT = 0, ptxT = 0, ptyT = 0;
-  function measure() {
-    const r = track.getBoundingClientRect(), total = r.height - stage.offsetHeight;
-    return total > 0 ? clamp(-r.top / total) : 1;
+  // Track geometry is read once per resize, so scrolling never forces a layout.
+  let target = 0, cur = 0, raf = 0, lastT = 0, ptxT = 0, ptyT = 0, trackTop = 0, trackSpan = 1, idleTimer = 0;
+  function geom() {
+    trackTop = track.getBoundingClientRect().top + scrollY;
+    trackSpan = Math.max(1, track.offsetHeight - stage.offsetHeight);
   }
+  function measure() { return clamp((scrollY - trackTop) / trackSpan); }
   function tick(ts) {
     raf = 0;
     const dt = lastT ? Math.min(.05, (ts - lastT) / 1000) : 1 / 60;
     lastT = ts;
-    const k = 1 - Math.exp(-dt * 9), d = target - cur;
-    cur = Math.abs(d) < .0004 || Math.abs(d) > .25 ? target : cur + d * k;
+    const k = 1 - Math.exp(-dt * 10), d = target - cur;
+    cur = Math.abs(d) < .0003 || Math.abs(d) > .25 ? target : cur + d * k;
     ptx += (ptxT - ptx) * k; pty += (ptyT - pty) * k;
     render(cur);
     if (cur !== target || Math.abs(ptxT - ptx) > .003 || Math.abs(ptyT - pty) > .003) raf = requestAnimationFrame(tick);
-    else lastT = 0;
+    else { lastT = 0; idleTimer = setTimeout(() => scene.classList.remove('moving'), 220); }
   }
-  function kick() { if (!raf) raf = requestAnimationFrame(tick); }
+  function kick() {
+    if (raf) return;
+    clearTimeout(idleTimer);
+    scene.classList.add('moving');
+    raf = requestAnimationFrame(tick);
+  }
   function onScroll() { target = measure(); kick(); }
   if (!RM && matchMedia('(hover: hover) and (pointer: fine)').matches) {
     addEventListener('pointermove', e => { ptxT = e.clientX / innerWidth * 2 - 1; ptyT = e.clientY / innerHeight * 2 - 1; kick(); }, { passive: true });
@@ -679,7 +712,7 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
     g.fillStyle = rg; g.fillRect(0, 0, 48, 48); return c;
   })();
   function layoutSky() {
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const dpr = Math.min(1.25, window.devicePixelRatio || 1);   // soft glows: full resolution buys nothing
     SW = innerWidth; SH = innerHeight;
     sky.width = Math.round(SW * dpr); sky.height = Math.round(SH * dpr);
     sx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -723,7 +756,8 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
   let lastSky = 0, skyRaf = 0, stageOn = true;
   function skyLoop(ts) {
     skyRaf = 0;
-    if (ts - lastSky > 60) { lastSky = ts; drawSky(ts / 1000); }
+    // ~12 fps is plenty for a twinkle, and hold still while the card is animating so it gets every frame
+    if (!raf && ts - lastSky > 80) { lastSky = ts; drawSky(ts / 1000); }
     if (stageOn && !document.hidden) skyRaf = requestAnimationFrame(skyLoop);
   }
   function skyWake() { if (!RM && !skyRaf && stageOn && !document.hidden) skyRaf = requestAnimationFrame(skyLoop); }
@@ -737,13 +771,13 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
   let PW = 0, PH = 0, petals = [], prun = false, plast = 0;
   const PCOL = [['#f29a1e', '#d9700f'], ['#f7b52a', '#e08d12'], ['#f29a1e', '#d9700f'], ['#c2183f', '#8e0f2c'], ['#fff7e8', '#e9dcc4']];
   function sizePetals() {
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const dpr = Math.min(1.5, window.devicePixelRatio || 1);
     PW = innerWidth; PH = innerHeight;
     pc.width = Math.round(PW * dpr); pc.height = Math.round(PH * dpr);
     px.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
   function burst() {
-    const n = Math.round(Math.min(110, 50 + PW / 18));
+    const n = Math.round(Math.min(90, 36 + PW / 20));
     for (let i = 0; i < n; i++) {
       const c = PCOL[Math.floor(Math.random() * PCOL.length)], jas = c[0] === '#fff7e8';
       petals.push({
@@ -767,7 +801,6 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
       px.scale(1, .35 + .65 * Math.abs(Math.sin(q.fl)));
       px.beginPath(); px.ellipse(0, 0, q.w, q.h, 0, 0, 6.2832);
       px.fillStyle = q.c[0]; px.fill();
-      px.lineWidth = .6; px.strokeStyle = q.c[1]; px.stroke();
       px.restore();
     }
     if (petals.length) requestAnimationFrame(pstep); else { prun = false; px.clearRect(0, 0, PW, PH); }
@@ -775,7 +808,7 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
 
   // ---------- settings ----------
   const RSVP_TO = '';   // a WhatsApp number with country code (e.g. 9198XXXXXXXX) sends replies straight to that chat; empty lets the guest pick
-  const MAP_URL = '';   // the venue's Google Maps share link, for an exact pin; empty searches by name
+  const MAP_URL = 'https://maps.app.goo.gl/aWKCJA8SwJBW33zB7';   // the venue's Google Maps pin; empty searches by name
   if (MAP_URL) $('maps').href = MAP_URL;
   let framed = false;
   try { framed = window.top !== window.self; } catch (e) { framed = true; }
@@ -824,6 +857,22 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
       yesMsg: 'नमस्ते नित्या और पीयूष! हम 25 नवंबर को आपके विवाह समारोह में अवश्य आएँगे। बहुत-बहुत बधाई!',
       noMsg: 'नमस्ते नित्या और पीयूष, खेद है कि हम 25 नवंबर को नहीं आ पाएँगे। आप दोनों को ढेर सारा प्यार और आशीर्वाद।',
       closeH: 'प्रेम और आभार सहित', closing: 'इस शुभ अवसर पर आपके साथ उत्सव मनाने की हमें प्रतीक्षा रहेगी।', again: 'कार्ड फिर से खोलें'
+    },
+    te: {
+      skip: 'వివరాలకు వెళ్ళండి', music: 'సంగీతం', dear: 'ప్రియమైన',
+      blessingH: 'ఆశీస్సులు మరియు ప్రేమతో',
+      quote: 'మా కుటుంబాల ఆశీర్వాదాలతో, మాకు అత్యంత ఆత్మీయుల ప్రేమతో, మా కొత్త జీవిత ప్రారంభ వేడుకకు మిమ్మల్ని సాదరంగా ఆహ్వానిస్తున్నాము.',
+      countH: 'శుభ ముహూర్తానికి ఇంకా', days: 'రోజులు', day: 'రోజు', hours: 'గంటలు', mins: 'నిమిషాలు',
+      countNote: 'బుధవారం, 25 నవంబర్, సాయంత్రం 7:00 గంటల వరకు', today: 'ఈ రోజే ఆ శుభ దినం!', married: '25 నవంబర్ 2026న వివాహం జరిగింది',
+      factsH: 'వేడుక', dateL: 'తేదీ', dateV: '25 నవంబర్ 2026', dateS: 'బుధవారం',
+      timeL: 'సమయం', timeV: 'సాయంత్రం 7:00 గంటల నుండి', timeS: 'సాయంకాల వేడుక',
+      venueL: 'వేదిక', venueV: 'ది రాయల్ బై మెరాకి', venueS: 'సెక్టార్ 15, రోహిణి, ఢిల్లీ',
+      gcal: 'Google క్యాలెండర్', ical: 'Apple క్యాలెండర్', maps: 'దారి చూడండి',
+      rsvpH: 'దయచేసి తెలియజేయండి', rsvpP: 'WhatsApp లో నిత్య లేదా పీయూష్ కి తెలియజేయండి. కింద ఒక సమాధానం నొక్కి, వారి చాట్ ఎంచుకోండి.',
+      accept: 'సంతోషంగా వస్తాము', decline: 'క్షమించండి, రాలేము',
+      yesMsg: 'నమస్తే నిత్య & పీయూష్! 25 నవంబర్ న మీ పెళ్ళి వేడుకకు తప్పకుండా వస్తాము. హృదయపూర్వక శుభాకాంక్షలు!',
+      noMsg: 'నమస్తే నిత్య & పీయూష్, 25 నవంబర్ న రాలేకపోతున్నందుకు క్షమించండి. మీ ఇద్దరికీ మా ప్రేమ మరియు ఆశీస్సులు.',
+      closeH: 'ప్రేమ మరియు కృతజ్ఞతలతో', closing: 'ఈ శుభ సందర్భాన్ని మీతో కలిసి జరుపుకోవాలని ఎదురుచూస్తున్నాము.', again: 'కార్డును మళ్ళీ తెరవండి'
     }
   };
   let lang = 'en';
@@ -865,7 +914,8 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
   }));
   let saved = null;
   try { saved = localStorage.getItem('np-lang'); } catch (e) {}
-  applyLang(saved || ((navigator.language || '').toLowerCase().startsWith('hi') ? 'hi' : 'en'));
+  const navLang = (navigator.language || '').toLowerCase().slice(0, 2);
+  applyLang(saved || (T[navLang] ? navLang : 'en'));
   setInterval(updateCount, 20000);
 
   // ---------- music: a soft generative piece made in the browser (no file, no licence) ----------
@@ -966,10 +1016,9 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
   function stopAuto() { if (auto) { cancelAnimationFrame(auto); auto = 0; } }
   function openCard() {
     stopAuto();
-    const r = track.getBoundingClientRect(), total = r.height - stage.offsetHeight;
-    const from = scrollY, end = scrollY + r.top + total * .955;
+    const from = scrollY, end = trackTop + trackSpan * .955;
     if (end <= from + 2) return;
-    const dur = Math.max(2200, 8000 * (end - from) / (total * .955)), t0 = performance.now();
+    const dur = Math.max(2200, 8000 * (end - from) / (trackSpan * .955)), t0 = performance.now();
     const step = now => {
       const t = clamp((now - t0) / dur), e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
       scrollTo(0, from + (end - from) * e);
@@ -990,6 +1039,7 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
     const s = Math.min(stage.clientWidth / 392, stage.clientHeight / 676, 1.75);
     scene.style.zoom = s;
     AW = stage.clientWidth / s;
+    geom();
     layoutSky(); sizePetals();
     drawSky(performance.now() / 1000);
   }
@@ -1002,7 +1052,17 @@ body{margin:0;background:var(--night);color:var(--paper);font-family:var(--f-ser
     addEventListener('scroll', onScroll, { passive: true });
     skyWake();
   }
-  addEventListener('resize', () => { fit(); if (RM) render(1); else onScroll(); });
+  // Mobile toolbars resize the window mid-scroll; only a real size change rebuilds the canvases
+  let fitW = innerWidth, fitH = innerHeight, rzT = 0;
+  addEventListener('resize', () => {
+    clearTimeout(rzT);
+    rzT = setTimeout(() => {
+      if (innerWidth !== fitW || Math.abs(innerHeight - fitH) > 160) { fitW = innerWidth; fitH = innerHeight; fit(); }
+      else geom();
+      if (RM) render(1); else onScroll();
+    }, 120);
+  });
+  addEventListener('load', () => { geom(); if (!RM) onScroll(); });
   document.fonts && document.fonts.ready.then(() => render(RM ? 1 : cur));
 })();
 </script>
